@@ -1,0 +1,60 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/map-component.html">
+<link rel="import" href="/c-tiempo.html">
+<dom-module id="interconexion-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+
+
+      /* traffic-incidents{
+        height: 500px;
+        overflow-y: scroll;
+      } */
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+    <map-component tiempo_info="[[tiempo_info]]" lat2="{{lat}}" lon2="{{lon}}">
+    </map-component>
+
+    <c-tiempo tiempo_info="{{tiempo_info}}" lat="[[lat]]" lon="[[lon]]"></c-tiempo>
+
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class InterconexionApp extends Polymer.Element {
+      static get is() { return 'interconexion-app'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'interconexion-app'
+          },
+          tiempo_info: {
+            type: Array,
+            value: function () { return [] },
+            reflectToAttribute: true
+          },
+          radio: {
+            type: Number
+          },
+          lat: {
+            type: Number
+          },
+          lon: {
+            type: Number
+          }
+        };
+      }
+    }
+
+    window.customElements.define(InterconexionApp.is, InterconexionApp);
+  </script>
+</dom-module>

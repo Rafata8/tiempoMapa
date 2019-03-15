@@ -1,0 +1,94 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+
+
+<dom-module id="c-tiempo">
+  <template>
+    <style>
+
+    </style>
+
+    <iron-ajax id="ajaxActual" auto url=" http://api.openweathermap.org/data/2.5/find" params="[[myParams]]"
+      handle-as="json" on-response="respactual" on-error="mensajError">
+    </iron-ajax>
+
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class CTiempo extends Polymer.Element {
+      static get is() { return 'c-tiempo'; }
+      static get properties() {
+        return {
+          lat: {
+            type: Number,
+            value: '40.405993'
+          },
+          lon: {
+            type: Number,
+            value: '-3.839583'
+          },
+          cnt: {
+            type: Number,
+            value: 20
+          },
+          myParams: {
+            type: Object,
+            computed: '_definir_params(lat,lon,cnt,units,akey)'
+          },
+          akey: {
+            type: String,
+            value: "4b2e866fd22b59e48ae153242129db3c"
+          },
+          tiempo_info: {
+            value: function () { return [] },
+            type: Array,
+            notify: true
+          },
+          units: {
+            type: String,
+            value: "metric"
+          }
+
+        }
+
+      }
+
+      mensajError(e, request) {
+        this.dispatchEvent(new CustomEvent('weather-request-error', {detail: {error: e}}));
+      }
+
+      respactual(event, request) {
+        let apoyo = [];
+        let respuesta = request.response.list;
+         console.log(respuesta);
+        // this._loading = false;
+        for (let i = 0; i < respuesta.length; i++) {
+          apoyo.push({
+            name: respuesta[i].name,
+            lat: respuesta[i].coord.lat,
+            lon: respuesta[i].coord.lon,
+            temp: Math.floor(respuesta[i].main.temp),
+            temp_max: Math.floor(respuesta[i].main.temp_max),
+            temp_min: Math.floor(respuesta[i].main.temp_min),
+            icon: respuesta[i].weather[0].icon,
+            icono: "http://openweathermap.org/img/w/"+respuesta[i].weather[0].icon+".png",
+            description: respuesta[i].weather[0].description
+          })
+        }
+        this.tiempo_info = apoyo;
+      }
+
+      _definir_params(lat, lon, cnt,units, akey) {
+        return { lat: lat, lon: lon, cnt: cnt,units: units, APPID: akey };
+      }
+
+    }
+
+    window.customElements.define(CTiempo.is, CTiempo);
+  </script>
+</dom-module>

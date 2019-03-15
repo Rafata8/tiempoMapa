@@ -1,0 +1,292 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-image/iron-image.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/google-map/google-map.html">
+<link rel="import" href="/bower_components/google-map/google-map-search.html">
+
+<!---->
+<link rel="import" href="/c-tiempo.html">
+<link rel="import" href="/map-component.html">
+
+
+
+
+
+<dom-module id="weather2-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        color: red;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        --my-var: none;
+      }
+
+      .cargando {
+        display: var(--my-var);
+      }
+
+
+
+      paper-input {
+        display: inline-block;
+        padding: 2px;
+
+        --paper-input-container-label: {
+          color: red;
+          font-size: 1.3em;
+        }
+
+        ;
+
+        --paper-input-container-input-webkit-spinner: {
+          -webkit-appearance: none;
+        }
+
+        ;
+
+        --paper-input-container-shared-input-style: {
+
+          -webkit-appearance: textfield;
+        }
+
+        ;
+      }
+
+      paper-button {
+        text-transform: none;
+        color: white;
+        font-family: verdana;
+        font-weight: bold;
+        background-color: #6200EE;
+        border: 1px solid purple;
+        padding: 2px;
+      }
+
+      iron-image {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: lightgrey;
+        z-index: 0;
+      }
+
+      iron-icon {
+        cursor: pointer;
+        padding: 2px 50px 2px 2px;
+      }
+
+      h1,
+      p,
+      input,
+      button {
+        z-index: 10;
+      }
+
+      h1 {
+        margin: 10 auto;
+        color: blue
+      }
+
+      input {
+        width: 5em;
+      }
+
+      img.bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: auto;
+        min-height: 100%;
+
+        min-width: 1024px;
+
+        z-index: -999;
+      }
+    </style>
+
+
+
+    <img class="bg" src="[[fondo]]" alt="">
+    <iron-ajax id="ajaxActual" auto url=" http://api.openweathermap.org/data/2.5/weather" params="[[myParams1]]"
+      handle-as="json" on-response="respactual" on-error="mensajError">
+    </iron-ajax>
+
+
+
+    <h1> El Tiempoo </h1>
+
+    <div active$="[[loading]]">
+      <paper-spinner active class="cargando"></paper-spinner>
+    </div>
+
+    <paper-input label="Buscar por Código Postal!" placeholder="28224" value="{{paso1}}" on-keydown="checkForEnter"
+      type="Number">
+    </paper-input>
+
+    <iron-icon icon="search" on-click="buscar"></iron-icon>
+    <paper-button raised on-tap="actualizar">El tiempo aquí</paper-button>
+    <c-current id="actual"></c-current>
+    <!-- <map-component></map-component> -->
+
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class Weather2App extends Polymer.Element {
+      static get is() { return 'weather2-app'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'weather-app'
+          },
+          lat: {
+            type: Number,
+            value: 50.2
+          },
+          lon: {
+            type: Number,
+            value: -3.2
+          },
+          akey: {
+            type: String,
+            value: "4b2e866fd22b59e48ae153242129db3c"
+          },
+          units: {
+            type: String,
+            value: "metric"
+          },
+          myParams1: {
+            type: Object
+          },
+          myParams2: {
+            type: Object
+          },
+          myParams3: {
+            type: Object,
+            computed: '_definir_params(lat,lon,akey,units)'
+          },
+          myParams4: {
+            type: Object,
+            computed: '_definir_params2(lat,lon,akey,units)'
+          },
+          paso1: {
+            type: Number
+          },
+          fondo: {
+            type: String
+          },
+          loading: {
+            type: Boolean,
+            value: true
+          }
+        };
+      }
+
+
+
+      constructor() {
+        super();
+        this.getGeolocal();
+      }
+
+
+
+
+
+      checkForEnter(e) {
+        // check if 'enter' was pressed
+        if (e.keyCode === 13) {
+          // enter pressed!
+          this.buscar();
+        }
+      }
+
+
+      getGeolocal() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(objPosition => {
+            this.lon = objPosition.coords.longitude;
+            this.lat = objPosition.coords.latitude;
+            this.myParams1 = this.myParams3;
+            this.myParams2 = this.myParams4;
+          })
+        }
+        else {
+          console.log('Su navegador no soporta geolocalizacón');
+        }
+      }
+
+      mensajError(e, request) {
+        console.log('error en la peticion');
+        this.updateStyles({ '--my-var': 'none' });
+      }
+
+      respactual(event, request) {
+
+        let pasar = this.$.actual;
+        let respuesta = request.response;
+        pasar.temp = respuesta.main.temp + 'ºC';
+        pasar.humidity = respuesta.main.humidity + '%';
+        pasar.ciudad = respuesta.name;
+        pasar.descripcion = respuesta.weather[0].description;
+        this.fondo = "src/images/" + respuesta.weather[0].icon + "_b.png";
+
+        this.updateStyles({ '--my-var': 'none' });
+      }
+
+
+
+      _definir_params(lat, lon, akey, units) {
+        return { lat: lat, lon: lon, units: units, APPID: akey };
+      }
+
+      _definir_params2(lat, lon, akey, units) {
+        return { lat: lat, lon: lon, cnt: 20, units: units, APPID: akey };
+      }
+
+
+      /////////////////////
+      //////////////// no hace falta el generate request porque estan en auto el iron ajax
+
+      buscar() {
+        this.updateStyles({ '--my-var': 'block' });
+        this.myParams1 = { zip: this.paso1 + ',es', units: this.units, APPID: this.akey }
+        this.myParams2 = { zip: this.paso1 + ',es', units: this.units, APPID: this.akey }
+        //this.$.ajaxActual.generateRequest();
+        //this.$.ajaxProx.generateRequest();
+      }
+
+      actualizar() {
+        this.updateStyles({ '--my-var': 'block' });
+        this.getGeolocal();
+
+        this.$.ajaxActual.generateRequest();
+        this.$.ajaxProx.generateRequest();
+
+      }
+
+
+
+
+    }
+
+    window.customElements.define(Weather2App.is, Weather2App);
+  </script>
+</dom-module>

@@ -1,0 +1,6 @@
+{
+  "name": "weather2",
+  "short_name": "weather2",
+  "start_url": "/",
+  "display": "standalone"
+}

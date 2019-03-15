@@ -1,0 +1,158 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/google-map/google-map.html">
+<link rel="import" href="/bower_components/google-map/google-map-search.html">
+
+<dom-module id="map-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-map {
+        height: 400px;
+      }
+    </style>
+
+    <iron-ajax id="buscarCiudad" method="GET" url="https://maps.googleapis.com/maps/api/geocode/json"
+      params="{{params}}" handleAs="json" on-response="_geocodingResponse" on-error="mensajError">
+    </iron-ajax>
+
+    <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
+
+    <google-map id="map" map="{{map}}" latitude={{latitude}} longitude={{longitude}}
+      api-key="AIzaSyA3lpC78WC-xWGDlrxng8sxF4YLgMllumU" dragEvents=true>
+
+
+      <template is="dom-repeat" items="{{tiempo_info}}">
+        <google-map-marker label$="[[item.temp]]" icon="[[item.icono]]" latitude="[[item.lat]]" longitude="[[item.lon]]"
+          slot="[[eso]]">
+          <h2>{{item.name}}</h2>
+          <p>{{item.description}}</p>
+          <p>temp media: {{item.temp}}º</p>
+          <p>temp max: {{item.temp_max}}º</p>
+          <p>temp min: {{item.temp_min}}º</p>
+        </google-map-marker>
+      </template>
+
+    </google-map>
+
+    <button on-click="buscar">Tiempo aquí</button>
+
+
+  </template>
+
+  <script>
+    /**
+     * `map-component`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class MapComponent extends Polymer.Element {
+      static get is() { return 'map-component'; }
+      static get properties() {
+        return {
+          latitude: {
+            type: Number,
+            value: '40.405993',
+            reflectToAttribute: true
+          },
+          longitude: {
+            type: Number,
+            value: '-3.839583',
+            reflectToAttribute: true
+          },
+          eso: {
+            value: '',
+            reflectToAttribute: true,
+            notfy: true
+          },
+          tiempo_info: {
+            value: function () { return [] },
+            type: Array,
+            notify: true,
+            reflectToAttribute: true
+          },
+          lat2: {
+            type: Number,
+            notify: true
+          },
+          lon2: {
+            type: Number,
+            notify: true
+          },
+          city: {
+            value: ''
+          },
+          params: {
+            type: Object,
+            value: function () { return {} }
+          },
+          api_key_geocoding: {
+            type: String,
+            value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
+            reflectToAttribute: true
+          }
+        };
+      }
+
+      //  ready(){
+      //    super.ready();
+      //    this.traffic_info=[{lat: '0', lon: '0'},
+      //    {lat: '0', lon: '0'}];
+      //  }
+      buscar() {
+        this.lat2 = this.latitude;
+        this.lon2 = this.longitude;
+      }
+
+      keyupInput(e) {
+        if (e.keyCode === 13) {
+          this.city = this.$.searchBox.value;
+          this.$.searchBox.value='';
+          this.params = {};
+          if (this.api_key_geocoding) {
+            this.params.key = this.api_key_geocoding;
+            this.params.address = this.city;
+            this.$.buscarCiudad.generateRequest();
+          } else {
+            console.error('Api key is required');
+          }
+        }
+
+
+      }
+
+      mensajError(e, request) {
+        this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+      }
+
+      _geocodingResponse(e, res) {
+        let resultado = res.response.results;
+        if (resultado && resultado.length > 0) {
+          //console.log(resultado)
+          this.latitude = resultado[0].geometry.location.lat;
+          this.longitude = resultado[0].geometry.location.lng;
+          this.lat2 = this.latitude;
+          this.lon2 = this.longitude;
+        }
+        else {
+          console.log('Error Geocoding: response is empty');
+          alert('Error. Prueba a poner: "Ciudad, Pais", o algo más específico.');
+          //this.fire('geocoding-request-error', { error: e });
+          this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+        }
+
+      }
+
+
+
+
+    }
+
+    window.customElements.define(MapComponent.is, MapComponent);
+  </script>
+</dom-module>
