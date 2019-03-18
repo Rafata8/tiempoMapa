@@ -58,14 +58,31 @@
 
       }
 
+      constructor() {
+        super();
+        this.getGeolocal();
+      }
+
+      getGeolocal() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(objPosition => {
+            this.lon = objPosition.coords.longitude;
+            this.lat = objPosition.coords.latitude;
+          })
+        }
+        else {
+          console.log('Su navegador no soporta geolocalizacón');
+        }
+      }
+
       mensajError(e, request) {
-        this.dispatchEvent(new CustomEvent('weather-request-error', {detail: {error: e}}));
+        this.dispatchEvent(new CustomEvent('weather-request-error', { detail: { error: e } }));
       }
 
       respactual(event, request) {
         let apoyo = [];
         let respuesta = request.response.list;
-         //console.log(respuesta);
+        //console.log(respuesta);
         // this._loading = false;
         for (let i = 0; i < respuesta.length; i++) {
           apoyo.push({
@@ -76,15 +93,15 @@
             temp_max: Math.floor(respuesta[i].main.temp_max),
             temp_min: Math.floor(respuesta[i].main.temp_min),
             icon: respuesta[i].weather[0].icon,
-            icono: "http://openweathermap.org/img/w/"+respuesta[i].weather[0].icon+".png",
+            icono: "http://openweathermap.org/img/w/" + respuesta[i].weather[0].icon + ".png",
             description: respuesta[i].weather[0].description
           })
         }
         this.tiempo_info = apoyo;
       }
 
-      _definir_params(lat, lon, cnt,units, akey) {
-        return { lat: lat, lon: lon, cnt: cnt,units: units, APPID: akey };
+      _definir_params(lat, lon, cnt, units, akey) {
+        return { lat: lat, lon: lon, cnt: cnt, units: units, APPID: akey };
       }
 
     }
