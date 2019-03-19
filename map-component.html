@@ -1,6 +1,7 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/bower_components/google-map/google-map.html">
 <link rel="import" href="/bower_components/google-map/google-map-search.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="map-component">
   <template>
@@ -37,7 +38,8 @@
 
     </google-map>
 
-    <button on-click="buscar">Tiempo aquí</button>
+    <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button>
+    <paper-spinner active$="{{_loading}}"></paper-spinner>
 
 
   </template>
@@ -73,7 +75,6 @@
           tiempo_info: {
             value: function () { return [] },
             type: Array,
-            notify: true,
             reflectToAttribute: true
           },
           lat2: {
@@ -95,24 +96,36 @@
             type: String,
             value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
             reflectToAttribute: true
+          },
+          _loading: {
+            type: Boolean,
+            value: false,
+            notify: true
           }
         };
       }
 
-      //  ready(){
-      //    super.ready();
-      //    this.traffic_info=[{lat: '0', lon: '0'},
-      //    {lat: '0', lon: '0'}];
-      //  }
+
       buscar() {
-        this.lat2 = this.latitude;
-        this.lon2 = this.longitude;
+        if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
+          this._loading = true;
+          this.lat2 = this.latitude;
+          this.lon2 = this.longitude;
+        }
+        else{
+          this.lat2 = 0;
+          this.lon2 = 0;
+          this.lat2 = this.latitude;
+          this.lon2 = this.longitude;
+        }
+
       }
+
 
       keyupInput(e) {
         if (e.keyCode === 13) {
           this.city = this.$.searchBox.value;
-          this.$.searchBox.value='';
+          this.$.searchBox.value = '';
           this.params = {};
           if (this.api_key_geocoding) {
             this.params.key = this.api_key_geocoding;
@@ -136,8 +149,7 @@
           //console.log(resultado)
           this.latitude = resultado[0].geometry.location.lat;
           this.longitude = resultado[0].geometry.location.lng;
-          this.lat2 = this.latitude;
-          this.lon2 = this.longitude;
+          this.buscar();
         }
         else {
           console.log('Error Geocoding: response is empty');

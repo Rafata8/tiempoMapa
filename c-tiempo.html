@@ -52,6 +52,11 @@
           units: {
             type: String,
             value: "metric"
+          },
+          _loading:{
+            type: Boolean,
+            value: false,
+            notify:true
           }
 
         }
@@ -98,6 +103,9 @@
           })
         }
         this.tiempo_info = apoyo;
+        this._loading=false;
+        this.dispatchEvent(new CustomEvent('traffic_info-ready', {  }));
+
       }
 
       _definir_params(lat, lon, cnt, units, akey) {
