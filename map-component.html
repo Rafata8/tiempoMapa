@@ -26,7 +26,7 @@
 
 
       <template is="dom-repeat" items="{{tiempo_info}}">
-        <google-map-marker label$="[[item.temp]]" icon="[[item.icono]]" latitude="[[item.lat]]" longitude="[[item.lon]]"
+        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" latitude="[[item.lat]]" longitude="[[item.lon]]"
           slot="[[eso]]">
           <h2>{{item.name}}</h2>
           <p>{{item.description}}</p>
@@ -105,6 +105,16 @@
         };
       }
 
+      getIcon(iconUrl) {
+        return new google.maps.MarkerImage(
+          iconUrl, //url
+          null, //size
+          null, //origin
+          new google.maps.Point(30, 22), //anchor
+          new google.maps.Size(60, 45)
+        );
+      }
+
 
       buscar() {
         if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
@@ -112,7 +122,7 @@
           this.lat2 = this.latitude;
           this.lon2 = this.longitude;
         }
-        else{
+        else {
           this.lat2 = 0;
           this.lon2 = 0;
           this.lat2 = this.latitude;
