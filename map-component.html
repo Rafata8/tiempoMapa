@@ -26,13 +26,13 @@
 
 
       <template is="dom-repeat" items="{{tiempo_info}}">
-        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" latitude="[[item.lat]]" longitude="[[item.lon]]"
-          slot="[[eso]]">
-          <h2>{{item.name}}</h2>
+        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" info="[[getInfo(item.icono)]]"
+          latitude="[[item.lat]]" longitude="[[item.lon]]" open="true" slot="markers">
+          <!-- <h2>{{item.name}}</h2>
           <p>{{item.description}}</p>
           <p>temp media: {{item.temp}}º</p>
           <p>temp max: {{item.temp_max}}º</p>
-          <p>temp min: {{item.temp_min}}º</p>
+          <p>temp min: {{item.temp_min}}º</p> -->
         </google-map-marker>
       </template>
 
@@ -115,6 +115,14 @@
         );
       }
 
+      getInfo(iconUrl) {
+        console.log('hola?')
+        return new google.maps.InfoWindow({
+          content: 'yyyeeeeeeeyyyyy'
+        });
+
+
+      }
 
       buscar() {
         if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
