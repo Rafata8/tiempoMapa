@@ -13,8 +13,87 @@
       google-map {
         height: 400px;
       }
+
+      .editor-stage .snow {
+        height: 50px;
+        background: #fff;
+      }
+
+      .snow {
+        position: fixed;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100vh;
+        background: none;
+        background-image: url('https://s3-eu-west-1.amazonaws.com/static-ressources/s1.png'), url('https://s3-eu-west-1.amazonaws.com/static-ressources/s2.png'), url('https://s3-eu-west-1.amazonaws.com/static-ressources/s3.png');
+        z-index: 100;
+        -webkit-animation: snow 1s linear infinite;
+        -moz-animation: snow 1s linear infinite;
+        -ms-animation: snow 1s linear infinite;
+        animation: snow 1s linear infinite;
+      }
+
+      @keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
+
+      @-moz-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 400px 1000px, 200px 400px, 100px 300px;
+        }
+      }
+
+      @-webkit-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
+
+      @-ms-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
     </style>
 
+    <div class="snow"></div>
     <iron-ajax id="buscarCiudad" method="GET" url="https://maps.googleapis.com/maps/api/geocode/json"
       params="{{params}}" handleAs="json" on-response="_geocodingResponse" on-error="mensajError">
     </iron-ajax>
@@ -26,8 +105,8 @@
 
 
       <template is="dom-repeat" items="{{tiempo_info}}">
-        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" info="[[getInfo(item.icono)]]"
-          latitude="[[item.lat]]" longitude="[[item.lon]]" open="true" slot="markers">
+        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" latitude="[[item.lat]]"
+          longitude="[[item.lon]]" slot="markers">
           <!-- <h2>{{item.name}}</h2>
           <p>{{item.description}}</p>
           <p>temp media: {{item.temp}}º</p>
@@ -40,6 +119,9 @@
 
     <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button>
     <paper-spinner active$="{{_loading}}"></paper-spinner>
+
+    <!-- <button on-click="getResourceUtilization">URSS</button> -->
+    <!-- <button on-click="aumentarmemoria">Memo</button> -->
 
 
   </template>
@@ -101,8 +183,26 @@
             type: Boolean,
             value: false,
             notify: true
+          },
+          words: {
+            type: Array,
+            value: function () { return [] }
           }
         };
+      }
+
+      ready() {
+        super.ready();
+        for (let i = 0; i < 12000000; i++) {
+          this.words.push({
+            "page": 12,
+            "content": 12,
+            "hpos": 'sd',
+            "vpos": 'sd',
+            "width": 'sd',
+            "height": 'sd'
+          });
+        }
       }
 
       getIcon(iconUrl) {
@@ -178,7 +278,16 @@
 
       }
 
+      getResourceUtilization() {
 
+        let memoryInfo = window.performance.memory;
+        console.log(memoryInfo);
+        let usedMemory = memoryInfo.usedJSHeapSize;
+        console.log("Used memory:  " + usedMemory + " bits");
+
+        let frames = 1 / (-performance.now() + performance.now());
+        console.log("Average of frames " + frames + " fps");
+      }
 
 
     }
