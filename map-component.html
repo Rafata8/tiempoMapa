@@ -15,31 +15,26 @@
       }
     </style>
 
-    <iron-ajax id="buscarCiudad" method="GET" url="https://maps.googleapis.com/maps/api/geocode/json"
-      params="{{params}}" handleAs="json" on-response="_geocodingResponse" on-error="mensajError">
-    </iron-ajax>
-
-    <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
 
     <google-map id="map" map="{{map}}" latitude={{latitude}} longitude={{longitude}}
       api-key="AIzaSyA3lpC78WC-xWGDlrxng8sxF4YLgMllumU" dragEvents=true>
 
 
       <template is="dom-repeat" items="{{tiempo_info}}">
-        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" info="[[getInfo(item.icono)]]"
-          latitude="[[item.lat]]" longitude="[[item.lon]]" open="true" slot="markers">
-          <!-- <h2>{{item.name}}</h2>
+        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" latitude="[[item.lat]]"
+          longitude="[[item.lon]]" slot="markers">
+          <h2>{{item.name}}</h2>
           <p>{{item.description}}</p>
           <p>temp media: {{item.temp}}º</p>
           <p>temp max: {{item.temp_max}}º</p>
-          <p>temp min: {{item.temp_min}}º</p> -->
+          <p>temp min: {{item.temp_min}}º</p>
         </google-map-marker>
       </template>
 
     </google-map>
 
-    <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button>
-    <paper-spinner active$="{{_loading}}"></paper-spinner>
+    <!-- <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button> -->
+    <!-- <paper-spinner active$="{{_loading}}"></paper-spinner> -->
 
 
   </template>
@@ -96,11 +91,6 @@
             type: String,
             value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
             reflectToAttribute: true
-          },
-          _loading: {
-            type: Boolean,
-            value: false,
-            notify: true
           }
         };
       }
@@ -124,60 +114,59 @@
 
       }
 
-      buscar() {
-        if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
-          this._loading = true;
-          this.lat2 = this.latitude;
-          this.lon2 = this.longitude;
-        }
-        else {
-          this.lat2 = 0;
-          this.lon2 = 0;
-          this.lat2 = this.latitude;
-          this.lon2 = this.longitude;
-        }
+      // buscar() {
+      //   if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
+      //     this._loading = true;
+      //     this.lat2 = this.latitude;
+      //     this.lon2 = this.longitude;
+      //   }
+      //   else {
+      //     this.lat2 = 0;
+      //     this.lon2 = 0;
+      //     this.lat2 = this.latitude;
+      //     this.lon2 = this.longitude;
+      //   }
 
-      }
-
-
-      keyupInput(e) {
-        if (e.keyCode === 13) {
-          this.city = this.$.searchBox.value;
-          this.$.searchBox.value = '';
-          this.params = {};
-          if (this.api_key_geocoding) {
-            this.params.key = this.api_key_geocoding;
-            this.params.address = this.city;
-            this.$.buscarCiudad.generateRequest();
-          } else {
-            console.error('Api key is required');
-          }
-        }
+      // }
 
 
-      }
+      // keyupInput(e) {
+      //   if (e.keyCode === 13) {
+      //     this.city = this.$.searchBox.value;
+      //     this.$.searchBox.value = '';
+      //     this.params = {};
+      //     if (this.api_key_geocoding) {
+      //       this.params.key = this.api_key_geocoding;
+      //       this.params.address = this.city;
+      //       this.$.buscarCiudad.generateRequest();
+      //     } else {
+      //       console.error('Api key is required');
+      //     }
+      //   }
 
-      mensajError(e, request) {
-        this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
-      }
 
-      _geocodingResponse(e, res) {
-        let resultado = res.response.results;
-        if (resultado && resultado.length > 0) {
-          //console.log(resultado)
-          this.latitude = resultado[0].geometry.location.lat;
-          this.longitude = resultado[0].geometry.location.lng;
-          this.buscar();
-        }
-        else {
-          console.log('Error Geocoding: response is empty');
-          alert('Error. Prueba a poner: "Ciudad, Pais", o algo más específico.');
-          //this.fire('geocoding-request-error', { error: e });
-          this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
-        }
+      // }
 
-      }
+      // mensajError(e, request) {
+      //   this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+      // }
 
+      // _geocodingResponse(e, res) {
+      //   let resultado = res.response.results;
+      //   if (resultado && resultado.length > 0) {
+      //     //console.log(resultado)
+      //     this.latitude = resultado[0].geometry.location.lat;
+      //     this.longitude = resultado[0].geometry.location.lng;
+      //     this.buscar();
+      //   }
+      //   else {
+      //     console.log('Error Geocoding: response is empty');
+      //     alert('Error. Prueba a poner: "Ciudad, Pais", o algo más específico.');
+      //     //this.fire('geocoding-request-error', { error: e });
+      //     this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+      //   }
+
+      // }
 
 
 

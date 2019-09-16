@@ -7,9 +7,15 @@
     <style>
 
     </style>
+    <paper-spinner active$="{{_loading}}"></paper-spinner>
 
-    <iron-ajax id="ajaxActual" auto url=" http://api.openweathermap.org/data/2.5/find" params="[[myParams]]"
-      handle-as="json" on-response="respactual" on-error="mensajError">
+    <iron-ajax id="buscarCiudad" method="GET" url="https://maps.googleapis.com/maps/api/geocode/json"
+      params="{{params}}" handleAs="json" on-response="_geocodingResponse" on-error="mensajError">
+    </iron-ajax>
+
+    <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
+    <iron-ajax id="ajaxActual" url=" http://api.openweathermap.org/data/2.5/find" params="[[myParams]]" handle-as="json"
+      on-response="respactual" on-error="mensajError">
     </iron-ajax>
 
 
@@ -53,10 +59,19 @@
             type: String,
             value: "metric"
           },
-          _loading:{
+          _loading: {
             type: Boolean,
             value: false,
-            notify:true
+            notify: true
+          },
+          params: {
+            type: Object,
+            value: function () { return {} }
+          },
+          api_key_geocoding: {
+            type: String,
+            value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
+            reflectToAttribute: true
           }
 
         }
@@ -66,6 +81,11 @@
       constructor() {
         super();
         this.getGeolocal();
+      }
+
+      ready() {
+        super.ready()
+        this.$.ajaxActual.generateRequest()
       }
 
       getGeolocal() {
@@ -103,14 +123,71 @@
           })
         }
         this.tiempo_info = apoyo;
-        this._loading=false;
-        this.dispatchEvent(new CustomEvent('traffic_info-ready', {  }));
+        this._loading = false;
+        this.dispatchEvent(new CustomEvent('traffic_info-ready', {}));
 
       }
 
       _definir_params(lat, lon, cnt, units, akey) {
         return { lat: lat, lon: lon, cnt: cnt, units: units, APPID: akey };
       }
+
+      keyupInput(e) {
+        if (e.keyCode === 13) {
+          this.city = this.$.searchBox.value;
+          this.$.searchBox.value = '';
+          this.params = {};
+          if (this.api_key_geocoding) {
+            this.params.key = this.api_key_geocoding;
+            this.params.address = this.city;
+            this._loading = true;
+            this.$.buscarCiudad.generateRequest();
+          } else {
+            console.error('Api key is required');
+          }
+        }
+
+
+      }
+
+      _geocodingResponse(e, res) {
+        let resultado = res.response.results;
+        if (resultado && resultado.length > 0) {
+          //console.log(resultado)
+          this.lat = resultado[0].geometry.location.lat;
+          this.lon = resultado[0].geometry.location.lng;
+          // this.buscar();
+          this.$.ajaxActual.generateRequest()
+        }
+        else {
+          console.log('Error Geocoding: response is empty');
+          alert('Error. Prueba a poner: "Ciudad, Pais", o algo más específico.');
+          this._loading = false;
+          //this.fire('geocoding-request-error', { error: e });
+          this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+        }
+
+      }
+
+
+      mensajError(e, request) {
+        this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+      }
+
+      // buscar() {
+      //   if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
+      //     this._loading = true;
+      //     this.lat2 = this.latitude;
+      //     this.lon2 = this.longitude;
+      //   }
+      //   else {
+      //     this.lat2 = 0;
+      //     this.lon2 = 0;
+      //     this.lat2 = this.latitude;
+      //     this.lon2 = this.longitude;
+      //   }
+
+      // }
 
     }
 
