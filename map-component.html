@@ -184,6 +184,7 @@
             value: false,
             notify: true
           },
+          // array para aumentar memoria consumida
           words: {
             type: Array,
             value: function () { return [] }
@@ -191,6 +192,7 @@
         };
       }
 
+      // aumentamos la memoria consumida desde segundo 1
       ready() {
         super.ready();
         for (let i = 0; i < 12000000; i++) {
