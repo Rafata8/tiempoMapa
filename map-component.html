@@ -3,7 +3,7 @@
 <link rel="import" href="/bower_components/google-map/google-map-search.html">
 <link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
 
-<dom-module id="map-component">
+<dom-module id="map-component-ti">
   <template>
     <style>
       :host {
@@ -128,15 +128,15 @@
 
   <script>
     /**
-     * `map-component`
+     * `map-component-ti`
      * 
      *
      * @customElement
      * @polymer
      * @demo demo/index.html
      */
-    class MapComponent extends Polymer.Element {
-      static get is() { return 'map-component'; }
+    class MapComponentTi extends Polymer.Element {
+      static get is() { return 'map-component-ti'; }
       static get properties() {
         return {
           latitude: {
@@ -294,6 +294,6 @@
 
     }
 
-    window.customElements.define(MapComponent.is, MapComponent);
+    window.customElements.define(MapComponentTi.is, MapComponentTi);
   </script>
 </dom-module>

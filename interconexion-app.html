@@ -1,5 +1,5 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import" href="/map-component.html">
+<link rel="import" href="/map-component-ti.html">
 <link rel="import" href="/c-tiempo.html">
 <dom-module id="interconexion-app">
   <template>
@@ -17,8 +17,8 @@
     </style>
 
       <h2>Hello [[prop1]]!</h2>
-      <map-component tiempo_info="[[tiempo_info]]" lat2="{{lat}}" lon2="{{lon}}" _loading="{{_loading}}">
-      </map-component>
+      <map-component-ti tiempo_info="[[tiempo_info]]" lat2="{{lat}}" lon2="{{lon}}" _loading="{{_loading}}">
+      </map-component-ti>
 
       <c-tiempo tiempo_info="{{tiempo_info}}" lat="[[lat]]" lon="[[lon]]" _loading="{{_loading}}"></c-tiempo>
 
