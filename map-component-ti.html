@@ -1,0 +1,299 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/google-map/google-map.html">
+<link rel="import" href="/bower_components/google-map/google-map-search.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
+
+<dom-module id="map-component-ti">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-map {
+        height: 400px;
+      }
+
+      .editor-stage .snow {
+        height: 50px;
+        background: #fff;
+      }
+
+      .snow {
+        position: fixed;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100vh;
+        background: none;
+        background-image: url('https://s3-eu-west-1.amazonaws.com/static-ressources/s1.png'), url('https://s3-eu-west-1.amazonaws.com/static-ressources/s2.png'), url('https://s3-eu-west-1.amazonaws.com/static-ressources/s3.png');
+        z-index: 100;
+        -webkit-animation: snow 1s linear infinite;
+        -moz-animation: snow 1s linear infinite;
+        -ms-animation: snow 1s linear infinite;
+        animation: snow 1s linear infinite;
+      }
+
+      @keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
+
+      @-moz-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 400px 1000px, 200px 400px, 100px 300px;
+        }
+      }
+
+      @-webkit-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
+
+      @-ms-keyframes snow {
+        0% {
+          background-position: 0px 0px, 0px 0px, 0px 0px;
+        }
+
+        50% {
+          background-position: 500px 500px, 100px 200px, -100px 150px;
+        }
+
+        100% {
+          background-position: 500px 1000px, 200px 400px, -100px 300px;
+        }
+      }
+    </style>
+
+    <div class="snow"></div>
+    <iron-ajax id="buscarCiudad" method="GET" url="https://maps.googleapis.com/maps/api/geocode/json"
+      params="{{params}}" handleAs="json" on-response="_geocodingResponse" on-error="mensajError">
+    </iron-ajax>
+
+    <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
+
+    <google-map id="map" map="{{map}}" latitude={{latitude}} longitude={{longitude}}
+      api-key="AIzaSyA3lpC78WC-xWGDlrxng8sxF4YLgMllumU" dragEvents=true>
+
+
+      <template is="dom-repeat" items="{{tiempo_info}}">
+        <google-map-marker label$="[[item.temp]]" icon="[[getIcon(item.icono)]]" latitude="[[item.lat]]"
+          longitude="[[item.lon]]" slot="markers">
+          <!-- <h2>{{item.name}}</h2>
+          <p>{{item.description}}</p>
+          <p>temp media: {{item.temp}}º</p>
+          <p>temp max: {{item.temp_max}}º</p>
+          <p>temp min: {{item.temp_min}}º</p> -->
+        </google-map-marker>
+      </template>
+
+    </google-map>
+
+    <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button>
+    <paper-spinner active$="{{_loading}}"></paper-spinner>
+
+    <!-- <button on-click="getResourceUtilization">URSS</button> -->
+    <!-- <button on-click="aumentarmemoria">Memo</button> -->
+
+
+  </template>
+
+  <script>
+    /**
+     * `map-component-ti`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class MapComponentTi extends Polymer.Element {
+      static get is() { return 'map-component-ti'; }
+      static get properties() {
+        return {
+          latitude: {
+            type: Number,
+            value: '40.405993',
+            reflectToAttribute: true
+          },
+          longitude: {
+            type: Number,
+            value: '-3.839583',
+            reflectToAttribute: true
+          },
+          eso: {
+            value: '',
+            reflectToAttribute: true,
+            notfy: true
+          },
+          tiempo_info: {
+            value: function () { return [] },
+            type: Array,
+            reflectToAttribute: true
+          },
+          lat2: {
+            type: Number,
+            notify: true
+          },
+          lon2: {
+            type: Number,
+            notify: true
+          },
+          city: {
+            value: ''
+          },
+          params: {
+            type: Object,
+            value: function () { return {} }
+          },
+          api_key_geocoding: {
+            type: String,
+            value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
+            reflectToAttribute: true
+          },
+          _loading: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          // array para aumentar memoria consumida
+          words: {
+            type: Array,
+            value: function () { return [] }
+          }
+        };
+      }
+
+      // aumentamos la memoria consumida desde segundo 1
+      ready() {
+        super.ready();
+        for (let i = 0; i < 12000000; i++) {
+          this.words.push({
+            "page": 12,
+            "content": 12,
+            "hpos": 'sd',
+            "vpos": 'sd',
+            "width": 'sd',
+            "height": 'sd'
+          });
+        }
+      }
+
+      getIcon(iconUrl) {
+        return new google.maps.MarkerImage(
+          iconUrl, //url
+          null, //size
+          null, //origin
+          new google.maps.Point(30, 22), //anchor
+          new google.maps.Size(60, 45)
+        );
+      }
+
+      getInfo(iconUrl) {
+        console.log('hola?')
+        return new google.maps.InfoWindow({
+          content: 'yyyeeeeeeeyyyyy'
+        });
+
+
+      }
+
+      buscar() {
+        if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
+          this._loading = true;
+          this.lat2 = this.latitude;
+          this.lon2 = this.longitude;
+        }
+        else {
+          this.lat2 = 0;
+          this.lon2 = 0;
+          this.lat2 = this.latitude;
+          this.lon2 = this.longitude;
+        }
+
+      }
+
+
+      keyupInput(e) {
+        if (e.keyCode === 13) {
+          this.city = this.$.searchBox.value;
+          this.$.searchBox.value = '';
+          this.params = {};
+          if (this.api_key_geocoding) {
+            this.params.key = this.api_key_geocoding;
+            this.params.address = this.city;
+            this.$.buscarCiudad.generateRequest();
+          } else {
+            console.error('Api key is required');
+          }
+        }
+
+
+      }
+
+      mensajError(e, request) {
+        this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+      }
+
+      _geocodingResponse(e, res) {
+        let resultado = res.response.results;
+        if (resultado && resultado.length > 0) {
+          //console.log(resultado)
+          this.latitude = resultado[0].geometry.location.lat;
+          this.longitude = resultado[0].geometry.location.lng;
+          this.buscar();
+        }
+        else {
+          console.log('Error Geocoding: response is empty');
+          alert('Error. Prueba a poner: "Ciudad, Pais", o algo más específico.');
+          //this.fire('geocoding-request-error', { error: e });
+          this.dispatchEvent(new CustomEvent('geocoding-request-error', { detail: { error: e } }));
+        }
+
+      }
+
+      getResourceUtilization() {
+
+        let memoryInfo = window.performance.memory;
+        console.log(memoryInfo);
+        let usedMemory = memoryInfo.usedJSHeapSize;
+        console.log("Used memory:  " + usedMemory + " bits");
+
+        let frames = 1 / (-performance.now() + performance.now());
+        console.log("Average of frames " + frames + " fps");
+      }
+
+
+    }
+
+    window.customElements.define(MapComponentTi.is, MapComponentTi);
+  </script>
+</dom-module>
