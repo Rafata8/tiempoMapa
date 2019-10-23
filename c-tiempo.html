@@ -53,7 +53,7 @@
             type: String,
             value: "metric"
           },
-          _loading:{
+          loading:{
             type: Boolean,
             value: false,
             notify:true
@@ -88,7 +88,7 @@
         let apoyo = [];
         let respuesta = request.response.list;
         //console.log(respuesta);
-        // this._loading = false;
+        // this.loading = false;
         for (let i = 0; i < respuesta.length; i++) {
           apoyo.push({
             name: respuesta[i].name,
@@ -103,7 +103,7 @@
           })
         }
         this.tiempo_info = apoyo;
-        this._loading=false;
+        this.loading=false;
         this.dispatchEvent(new CustomEvent('traffic_info-ready', {  }));
 
       }
