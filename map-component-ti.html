@@ -21,7 +21,7 @@
 
     <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
 
-    <google-map id="map" map="{{map}}" latitude={{latitude}} longitude={{longitude}}
+    <google-map id="map" map="{{map}}" latitude={{_latApoyo}} longitude={{_lonApoyo}}
       api-key="AIzaSyA3lpC78WC-xWGDlrxng8sxF4YLgMllumU" dragEvents=true>
 
 
@@ -38,8 +38,8 @@
 
     </google-map>
 
-    <button hidden$="[[_loading]]" on-click="buscar">Tiempo aquí</button>
-    <paper-spinner active$="{{_loading}}"></paper-spinner>
+    <button hidden$="[[loading]]" on-click="buscar">Tiempo aquí</button>
+    <paper-spinner active$="{{loading}}"></paper-spinner>
 
   </template>
 
@@ -56,31 +56,26 @@
       static get is() { return 'map-component-ti'; }
       static get properties() {
         return {
-          latitude: {
+          _latApoyo: {
             type: Number,
             value: '40.405993',
             reflectToAttribute: true
           },
-          longitude: {
+          _lonApoyo: {
             type: Number,
             value: '-3.839583',
             reflectToAttribute: true
-          },
-          eso: {
-            value: '',
-            reflectToAttribute: true,
-            notfy: true
           },
           tiempo_info: {
             value: function () { return [] },
             type: Array,
             reflectToAttribute: true
           },
-          lat2: {
+          lat: {
             type: Number,
             notify: true
           },
-          lon2: {
+          lon: {
             type: Number,
             notify: true
           },
@@ -96,7 +91,7 @@
             value: "AIzaSyAJuVw4UpWvvpnUzzdeKZN5Ydsd9y_SYs8",
             reflectToAttribute: true
           },
-          _loading: {
+          loading: {
             type: Boolean,
             value: false,
             notify: true
@@ -124,16 +119,16 @@
       }
 
       buscar() {
-        if (this.lat2 != this.latitude || this.lon2 != this.longitude) {
-          this._loading = true;
-          this.lat2 = this.latitude;
-          this.lon2 = this.longitude;
+        if (this.lat != this._latApoyo || this.lon != this._lonApoyo) {
+          this.loading = true;
+          this.lat = this._latApoyo;
+          this.lon = this._lonApoyo;
         }
         else {
-          this.lat2 = 0;
-          this.lon2 = 0;
-          this.lat2 = this.latitude;
-          this.lon2 = this.longitude;
+          this.lat = 0;
+          this.lon = 0;
+          this.lat = this._latApoyo;
+          this.lon = this._lonApoyo;
         }
 
       }
@@ -164,8 +159,8 @@
         let resultado = res.response.results;
         if (resultado && resultado.length > 0) {
           //console.log(resultado)
-          this.latitude = resultado[0].geometry.location.lat;
-          this.longitude = resultado[0].geometry.location.lng;
+          this._latApoyo = resultado[0].geometry.location.lat;
+          this._lonApoyo = resultado[0].geometry.location.lng;
           this.buscar();
         }
         else {
