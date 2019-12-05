@@ -14,7 +14,7 @@
     </iron-ajax>
 
     <input id="searchBox" placeholder="Search City" on-keyup="keyupInput">
-    <iron-ajax id="ajaxActual" url=" http://api.openweathermap.org/data/2.5/find" params="[[myParams]]" handle-as="json"
+    <iron-ajax id="ajaxActual" url=" https://api.openweathermap.org/data/2.5/find" params="[[myParams]]" handle-as="json"
       on-response="respactual" on-error="mensajError">
     </iron-ajax>
 
@@ -118,7 +118,7 @@
             temp_max: Math.floor(respuesta[i].main.temp_max),
             temp_min: Math.floor(respuesta[i].main.temp_min),
             icon: respuesta[i].weather[0].icon,
-            icono: "http://openweathermap.org/img/w/" + respuesta[i].weather[0].icon + ".png",
+            icono: "https://openweathermap.org/img/w/" + respuesta[i].weather[0].icon + ".png",
             description: respuesta[i].weather[0].description
           })
         }
