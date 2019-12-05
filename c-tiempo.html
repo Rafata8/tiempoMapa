@@ -8,7 +8,7 @@
 
     </style>
 
-    <iron-ajax id="ajaxActual" auto url=" http://api.openweathermap.org/data/2.5/find" params="[[myParams]]"
+    <iron-ajax id="ajaxActual" auto url=" https://api.openweathermap.org/data/2.5/find" params="[[myParams]]"
       handle-as="json" on-response="respactual" on-error="mensajError">
     </iron-ajax>
 
@@ -98,7 +98,7 @@
             temp_max: Math.floor(respuesta[i].main.temp_max),
             temp_min: Math.floor(respuesta[i].main.temp_min),
             icon: respuesta[i].weather[0].icon,
-            icono: "http://openweathermap.org/img/w/" + respuesta[i].weather[0].icon + ".png",
+            icono: "https://openweathermap.org/img/w/" + respuesta[i].weather[0].icon + ".png",
             description: respuesta[i].weather[0].description
           })
         }
